@@ -1,0 +1,106 @@
+﻿@page "/trainer/mixed-single"
+@using Smartik.Features.MathTrainer.Components
+@using Smartik.Features.MathTrainer.Models
+@using Smartik.Features.MathTrainer.Services
+@inject IMathGeneratorService GeneratorService
+
+<RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-mb-4 hide-on-print">🔢 Счет по одному примеру</RadzenText>
+
+<TrainerSingleLayout @bind-Count="_count"
+                     @bind-MaxNumber="_maxNumber"
+                     Presets="_mathPresets"
+                     Items="_items"
+                     OnGenerateRequired="GenerateItems"
+                     OnFocusRequired="FocusInput"
+                     @ref="_layoutRef">
+    <PlaceholderContent>
+        <RadzenCard Variant="Variant.Outlined" Class="rz-my-6 rz-p-12 hide-on-print" Style="text-align: center; border: 2px dashed #94a3b8;">
+            <RadzenIcon Icon="ads_click" Style="font-size: 4rem; color: var(--rz-text-secondary-color);" Class="rz-mb-4" />
+            <RadzenText TextStyle="TextStyle.H5" Class="rz-mb-2">Фокус-тренировка счета</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-text-secondary">Примеры будут появляться по одному. Идеально для максимальной концентрации!</RadzenText>
+        </RadzenCard>
+    </PlaceholderContent>
+
+    <ChildContent Context="currentIndex">
+        @if (_examples.Count > 0 && currentIndex < _examples.Count)
+        {
+            var item = _examples[currentIndex];
+            <RadzenStack @key="item" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1.5rem" Style="width: 100%;">
+                <div class="math-expr" style="font-size: 3.5rem !important; width: auto; gap: 20px;">
+                    <span>@item.FirstOperand</span>
+                    <span style="color: var(--rz-primary);">@(_operatorMapping[item.Operator])</span>
+                    <span>@item.SecondOperand</span>
+                </div>
+                <span style="font-size: 3.5rem; font-weight: bold; color: #334155;">=</span>
+
+                <!-- ИСПРАВЛЕНО: Прямой биндинг на модель + моментальный ValueOnInput -->
+                <RadzenTextBox @bind-Value="item.UserAnswer"
+                               ValueOnInput="true"
+                               @ref="_currentInput"
+                               @onkeydown="HandleKeyDown"
+                               Class="child-answer-input"
+                               Style="text-align: center; font-size: 2.5rem !important; font-weight: bold; width: 110px !important; height: 70px !important; border: 3px solid var(--rz-primary) !important; border-radius: 12px !important; box-shadow: none !important;"
+                               InputAttributes="@_inputAttrs"
+                               MaxLength="3" />
+            </RadzenStack>
+        }
+    </ChildContent>
+
+    <ResultTemplate Context="resIndex">
+        @{
+            var item = _examples[resIndex];
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Style="width: 100%;">
+                <div class="math-expr" style="font-size: 1.8rem !important; width: auto; gap: 8px;">
+                    <span>@item.FirstOperand</span>
+                    <span style="color: var(--rz-primary-dark);">@(_operatorMapping[item.Operator])</span>
+                    <span>@item.SecondOperand</span>
+                </div>
+                <span style="font-size: 1.8rem; font-weight: bold; color: #334155;">=</span>
+                <RadzenTextBox @bind-Value="item.UserAnswer"
+                               Disabled="true"
+                               Class="child-answer-input"
+                               Style="@GetResultStyle(item)"
+                               InputAttributes="@_resultInputAttrs" />
+            </RadzenStack>
+        }
+    </ResultTemplate>
+</TrainerSingleLayout>
+
+@code {
+    private int _count = 12; private int _maxNumber = 20;
+    private List<MathExample> _examples = [];
+    private List<ITrainerItem> _items = [];
+    private TrainerSingleLayout? _layoutRef;
+    private RadzenTextBox? _currentInput;
+
+    private readonly Dictionary<string, string> _operatorMapping = new() { { "+", "+" }, { "-", "−" } };
+    private readonly Dictionary<string, object> _inputAttrs = new() { { "style", "text-align: center; font-size: 2.5rem; font-weight: bold; font-family: 'Consolas', monospace;" }, { "inputmode", "decimal" } };
+    private readonly Dictionary<string, object> _resultInputAttrs = new() { { "style", "text-align: center; font-size: 1.4rem; font-weight: bold; font-family: 'Consolas', monospace;" } };
+    private readonly List<TrainerControl.TrainerPreset> _mathPresets = [new("3-4", "👶 3-4 года (до 5)", 6, 5), new("4-5", "👦 4-5 лет (до 10)", 12, 10), new("5-6", "🚀 5-6 лет (до 20)", 16, 20), new("6-7", "🎓 6-7 лет (профи)", 20, 20)];
+
+    private Task GenerateItems()
+    {
+        _examples = [.. GeneratorService.GenerateMixedExamples(_count, _maxNumber)];
+        foreach (var ex in _examples) ex.UserAnswer = string.Empty;
+        _items = [.. _examples];
+        return Task.CompletedTask;
+    }
+
+    private async Task FocusInput(int idx)
+    {
+        await Task.Delay(60);
+        if (_currentInput != null) await _currentInput.FocusAsync();
+    }
+
+    // ИСПРАВЛЕНО: Метод просто передает управление макету, так как данные уже лежат в модели!
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && _layoutRef != null)
+        {
+            await Task.Delay(10); // Крошечная пауза, чтобы поток успел зафиксировать последний символ
+            await _layoutRef.HandleNextClick();
+        }
+    }
+
+    private string GetResultStyle(MathExample e) => $"text-align: center; font-size: 1.4rem; font-weight: bold; font-family: 'Consolas', monospace; width: 55px !important; height: 38px !important; box-shadow: none !important; {(e.IsCorrect ? "border-color:#22c55e!important;background-color:#f0fdf4!important;color:#16a34a!important;" : "border-color:#ef4444!important;background-color:#fef2f2!important;color:#dc2626!important;")}";
+}

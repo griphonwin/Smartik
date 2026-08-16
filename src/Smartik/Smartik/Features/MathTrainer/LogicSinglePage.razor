@@ -1,0 +1,149 @@
+﻿@page "/trainer/logic-single"
+@using Smartik.Features.MathTrainer.Components
+@using Smartik.Features.MathTrainer.Models
+@using Smartik.Features.MathTrainer.Services
+@inject ILogicGeneratorService LogicService
+
+<RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-mb-4 hide-on-print">🧠 Логика по одному примеру</RadzenText>
+
+<TrainerSingleLayout @bind-Count="_count"
+                     @bind-MaxNumber="_maxNumber"
+                     Presets="_logicPresets"
+                     Items="_items"
+                     OnGenerateRequired="GenerateItems"
+                     OnFocusRequired="FocusInput"
+                     @ref="_layoutRef">
+    <PlaceholderContent>
+        <RadzenCard Variant="Variant.Outlined" Class="rz-my-6 rz-p-12 hide-on-print" Style="text-align: center; border: 2px dashed #94a3b8;">
+            <RadzenIcon Icon="biotech" Style="font-size: 4rem; color: var(--rz-text-secondary-color);" Class="rz-mb-4" />
+            <RadzenText TextStyle="TextStyle.H5" Class="rz-mb-2">Фокус-тренировка логики</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-text-secondary">Знаки сравнения и скрытые числа будут появляться по одному заданию.</RadzenText>
+        </RadzenCard>
+    </PlaceholderContent>
+
+    <ChildContent Context="currentIndex">
+        @if (_examples.Count > 0 && currentIndex < _examples.Count)
+        {
+            var item = _examples[currentIndex];
+
+            <RadzenCard @key="item" Class="notebook-grid rz-p-8 rz-shadow-3 rz-text-align-center hide-on-print" Style="max-width: 600px; margin: 2rem auto; border: 3px solid var(--rz-info-light) !important; border-radius: 16px !important; width: 100%;">
+                <RadzenStack AlignItems="AlignItems.Center" Gap="2rem">
+
+                    <div style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
+                        <div class="math-expr" style="width: auto; gap: 20px; display: inline-flex; align-items: center; font-size: 3.5rem !important;">
+
+                            @if (item.HiddenPosition == 0)
+                            {
+                                <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="3" />
+                            }
+                            else
+                            {
+
+                                <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 50px; text-align: center;">@item.LeftText</span>
+                            }
+
+                            @if (item.HiddenPosition == 1)
+                            {
+                                <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="1" />
+                            }
+                            else
+                            {
+
+                                <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 40px; text-align: center; color: var(--rz-primary-dark);">@item.CorrectSign</span>
+                            }
+
+                            @if (item.HiddenPosition == 2)
+                            {
+                                <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="3" />
+                            }
+                            else
+                            {
+
+                                <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 50px; text-align: center;">@item.RightText</span>
+                            }
+
+                        </div>
+                    </div>
+                </RadzenStack>
+            </RadzenCard>
+        }
+    </ChildContent>
+
+    <ResultTemplate Context="resIndex">
+        @{
+            var item = _examples[resIndex];
+            <div style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <div class="math-expr" style="width: auto; gap: 10px; display: inline-flex; align-items: center; font-size: 1.8rem !important;">
+
+                    @if (item.HiddenPosition == 0)
+                    {
+                        <RadzenTextBox @bind-Value="item.UserAnswer" Disabled="true" Class="child-answer-input" Style="@GetResultBoxStyle(item)" InputAttributes="@_resultInputAttrs" />
+                    }
+                    else
+                    {
+
+                        <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 30px; text-align: center;">@item.LeftText</span>
+                    }
+
+                    @if (item.HiddenPosition == 1)
+                    {
+                        <RadzenTextBox @bind-Value="item.UserAnswer" Disabled="true" Class="child-answer-input" Style="@GetResultBoxStyle(item)" InputAttributes="@_resultInputAttrs" />
+                    }
+                    else
+                    {
+
+                        <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 20px; text-align: center; color: var(--rz-primary-dark);">@item.CorrectSign</span>
+                    }
+
+                    @if (item.HiddenPosition == 2)
+                    {
+                        <RadzenTextBox @bind-Value="item.UserAnswer" Disabled="true" Class="child-answer-input" Style="@GetResultBoxStyle(item)" InputAttributes="@_resultInputAttrs" />
+                    }
+                    else
+                    {
+
+                        <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 30px; text-align: center;">@item.RightText</span>
+                    }
+
+                </div>
+            </div>
+        }
+    </ResultTemplate>
+</TrainerSingleLayout>
+
+@code {
+    private int _count = 12; private int _maxNumber = 10;
+    private List<LogicExample> _examples = [];
+    private List<ITrainerItem> _items = [];
+    private TrainerSingleLayout? _layoutRef;
+    private RadzenTextBox? _currentInput;
+
+    private readonly Dictionary<string, object> _inputAttrs = new() { { "style", "text-align: center; font-size: 2.5rem; font-weight: bold; font-family: 'Consolas', monospace;" }, { "inputmode", "decimal" } };
+    private readonly Dictionary<string, object> _resultInputAttrs = new() { { "style", "text-align: center; font-size: 1.4rem; font-weight: bold; font-family: 'Consolas', monospace;" } };
+    private readonly List<TrainerControl.TrainerPreset> _logicPresets = [new("3-4", "👶 3-4 года (до 5)", 6, 5), new("4-5", "👦 4-5 лет (до 10)", 12, 10), new("5-6", "🚀 5-6 лет (до 15)", 16, 15), new("6-7", "🎓 6-7 лет (профи)", 20, 20)];
+
+    private Task GenerateItems()
+    {
+        _examples = [.. LogicService.GenerateLogicExamples(_count, _maxNumber)];
+        foreach (var ex in _examples) ex.UserAnswer = string.Empty;
+        _items = [.. _examples];
+        return Task.CompletedTask;
+    }
+    private async Task FocusInput(int idx)
+    {
+        await Task.Delay(60);
+        if (_currentInput != null) await _currentInput.FocusAsync();
+    }
+
+    // ИСПРАВЛЕНО: Прямая передача без промежуточных массивов
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && _layoutRef != null)
+        {
+            await Task.Delay(10);
+            await _layoutRef.HandleNextClick();
+        }
+    }
+    private string GetBoxStyle() => "text-align: center; font-size: 2.5rem !important; font-weight: bold; width: 110px !important; height: 70px !important; border: 3px solid var(--rz-info) !important; border-radius: 12px !important; box-shadow: none !important;";
+    private string GetResultBoxStyle(LogicExample e) => $"text-align: center; font-size: 1.4rem; font-weight: bold; font-family: 'Consolas', monospace; width: 55px !important; height: 38px !important; box-shadow: none !important; {(e.IsCorrect ? "border-color:#22c55e!important;background-color:#f0fdf4!important;color:#16a34a!important;" : "border-color:#ef4444!important;background-color:#fef2f2!important;color:#dc2626!important;")}";
+}

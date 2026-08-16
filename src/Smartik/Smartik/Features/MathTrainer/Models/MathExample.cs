@@ -1,5 +1,8 @@
-﻿namespace Smartik.Features.MathTrainer.Models;
+﻿using System.Diagnostics;
 
+namespace Smartik.Features.MathTrainer.Models;
+
+[DebuggerDisplay("{FirstOperand} {Operator} {SecondOperand} = {Result} - {UserAnswer}")]
 public sealed class MathExample(int firstOperand, int secondOperand, string @operator, int result) : ITrainerItem
 {
     public int FirstOperand { get; } = firstOperand;

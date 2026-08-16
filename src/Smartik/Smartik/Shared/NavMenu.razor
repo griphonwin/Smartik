@@ -3,19 +3,14 @@
     <!-- Ссылка на Главную страницу дашборда -->
     <RadzenPanelMenuItem Text="🚀 Главная" Path="" Icon="home" />
 
-    <!-- Раздел для тренажеров (Вложенные пункты пишутся сразу внутри родительского тега) -->
-    <RadzenPanelMenuItem Text="school Занятия" Icon="school" Expanded="true">
+    <RadzenPanelMenuItem Text="Лист в клеточку" Icon="grid_on" Expanded="false">
+        <RadzenPanelMenuItem Text="Умный счет" Path="trainer/mixed" Icon="plus_one" />
+        <RadzenPanelMenuItem Text="Неравенства и логика" Path="trainer/logic" Icon="psychology" />
+    </RadzenPanelMenuItem>
 
-        <!-- Ссылка на Арифметику -->
-        <RadzenPanelMenuItem Text="🔢 Умный счет"
-                             Path="trainer/mixed"
-                             Icon="plus_one" />
-
-        <!-- Ссылка на Логику -->
-        <RadzenPanelMenuItem Text="🧠 Неравенства и логика"
-                             Path="trainer/logic"
-                             Icon="psychology" />
-
+    <RadzenPanelMenuItem Text="По одному примеру" Icon="ads_click" Expanded="true">
+        <RadzenPanelMenuItem Text="Фокус-счет" Path="trainer/mixed-single" Icon="calculate" />
+        <RadzenPanelMenuItem Text="Фокус-логика" Path="trainer/logic-single" Icon="lightbulb" />
     </RadzenPanelMenuItem>
 
 </RadzenPanelMenu>
