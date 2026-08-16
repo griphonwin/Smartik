@@ -32,6 +32,7 @@
                     <div style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
                         <div class="math-expr" style="width: auto; gap: 20px; display: inline-flex; align-items: center; font-size: 3.5rem !important;">
 
+                            <!-- ЛЕВОЕ ЧИСЛО -->
                             @if (item.HiddenPosition == 0)
                             {
                                 <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="3" />
@@ -42,16 +43,21 @@
                                 <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 50px; text-align: center;">@item.LeftText</span>
                             }
 
+                            <!-- ЗНАК СРАВНЕНИЯ (ИСПРАВЛЕНО: Теперь передаем точный строковый знак в параметры!) -->
                             @if (item.HiddenPosition == 1)
                             {
-                                <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="1" />
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Style="border: 2px dashed var(--rz-info-light); padding: 0.5rem; border-radius: 12px; background: #f8fafc;">
+                                    <RadzenButton Text="&lt;" Click='() => SelectSign(item, "<")' ButtonStyle="ButtonStyle.Info" Size="ButtonSize.Large" Style="font-size: 2rem; font-weight: bold; width: 60px; height: 60px; border-radius: 10px;" />
+                                    <RadzenButton Text="=" Click='() => SelectSign(item, "=")' ButtonStyle="ButtonStyle.Warning" Size="ButtonSize.Large" Style="font-size: 2rem; font-weight: bold; width: 60px; height: 60px; border-radius: 10px;" />
+                                    <RadzenButton Text="&gt;" Click='() => SelectSign(item, ">")' ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" Style="font-size: 2rem; font-weight: bold; width: 60px; height: 60px; border-radius: 10px;" />
+                                </RadzenStack>
                             }
                             else
                             {
-
                                 <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 40px; text-align: center; color: var(--rz-primary-dark);">@item.CorrectSign</span>
                             }
 
+                            <!-- ПРАВОЕ ЧИСЛО -->
                             @if (item.HiddenPosition == 2)
                             {
                                 <RadzenTextBox @bind-Value="item.UserAnswer" ValueOnInput="true" @ref="_currentInput" @onkeydown="HandleKeyDown" Class="child-answer-input" Style="@GetBoxStyle()" InputAttributes="@_inputAttrs" MaxLength="3" />
@@ -112,7 +118,7 @@
 </TrainerSingleLayout>
 
 @code {
-    private int _count = 12; private int _maxNumber = 10;
+    private int _count = 20; private int _maxNumber = 20;
     private List<LogicExample> _examples = [];
     private List<ITrainerItem> _items = [];
     private TrainerSingleLayout? _layoutRef;
@@ -129,18 +135,30 @@
         _items = [.. _examples];
         return Task.CompletedTask;
     }
+
     private async Task FocusInput(int idx)
     {
         await Task.Delay(60);
-        if (_currentInput != null) await _currentInput.FocusAsync();
+        if (_currentInput != null && _examples[idx].HiddenPosition != 1)
+        {
+            await _currentInput.FocusAsync();
+        }
     }
 
-    // ИСПРАВЛЕНО: Прямая передача без промежуточных массивов
+    private async Task SelectSign(LogicExample item, string sign)
+    {
+        if (_layoutRef == null) return;
+        item.UserAnswer = sign;
+
+        await Task.Delay(15);
+        await _layoutRef.HandleNextClick();
+    }
+
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter" && _layoutRef != null)
         {
-            await Task.Delay(10);
+            await Task.Delay(15);
             await _layoutRef.HandleNextClick();
         }
     }

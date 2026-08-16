@@ -39,6 +39,23 @@ h1:focus {
 }
 
 /* ==========================================================================
+   СТРУКТУРА ГЛАВНОГО КАРКАСА (MAIN LAYOUT)
+   ========================================================================== */
+
+.smartik-global-layout {
+    grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body' !important;
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: auto 1fr !important;
+    height: 100vh !important;
+}
+
+.smartik-body-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    width: 100% !important;
+}
+
+/* ==========================================================================
    ИНТЕРФЕЙС ГЛАВНОЙ СТРАНИЦЫ DASHBOARD
    ========================================================================== */
 
@@ -97,7 +114,7 @@ span.equals-sign {
     margin-right: 12px !important;
 }
 
-/* 🌟 ИСПРАВЛЕНО ДЛЯ RADZEN 11: Применяем жесткие рамки квадратов И для Numeric, И для TextBox 🌟 */
+/* КЛЕТКИ ВВОДА INPUT */
 .rz-stack .rz-numeric.child-answer-input,
 .rz-stack .rz-textbox.child-answer-input {
     display: inline-flex !important;
@@ -113,7 +130,6 @@ span.equals-sign {
     transition: all 0.2s ease-in-out;
 }
 
-    /* Лазурная неоновая подсветка активной клетки при фокусе курсора */
     .rz-stack .rz-numeric.child-answer-input:focus-within,
     .rz-stack .rz-textbox.child-answer-input:focus-within {
         border-color: #3b82f6 !important;
@@ -121,7 +137,6 @@ span.equals-sign {
         background-color: #f8fafc !important;
     }
 
-/* Тотальное выравнивание шрифтов по центру во всех внутренних инпутах Radzen 11 */
 .child-answer-input .rz-numeric-input,
 .child-answer-input .rz-inputtext,
 .child-answer-input input {
@@ -134,7 +149,6 @@ span.equals-sign {
     width: 100% !important;
 }
 
-/* 🌟 ИСПРАВЛЕНО: Тотальное и гарантированное уничтожение стрелочек ▲ ▼ во всех проявлениях */
 .child-answer-input button.rz-numeric-button,
 .child-answer-input .rz-numeric-button,
 .child-answer-input button,
@@ -155,10 +169,11 @@ span.equals-sign {
 }
 
 /* ==========================================================================
-   БЕЗУПРЕЧНЫЕ СТИЛИ ДЛЯ ВЫГРУЗКИ НА ПЕЧАТЬ
+   БЕЗУПРЕЧНЫЕ СТИЛИ ПЕЧАТИ (БЕЗ СКРЫТИЯ СИСТЕМНЫХ КЛАССОВ RADZEN)
    ========================================================================== */
 @media print {
-    .rz-header, .rz-sidebar, .hide-on-print, .rz-card.rz-variant-filled, .rz-alert, h1, header, aside, .rz-selectbar, label {
+    /* 1. Скрываем строго по уникальным классам навигации и тулбара */
+    .rz-header, .rz-sidebar, .hide-on-print, .rz-alert, .rz-selectbar, .rz-button, header, aside, h1 {
         display: none !important;
         height: 0 !important;
         width: 0 !important;
@@ -167,60 +182,62 @@ span.equals-sign {
         overflow: hidden !important;
     }
 
-    .rz-layout {
+    /* 2. Принудительно раскрываем и делаем видимыми контейнеры макета */
+    html, body, .rz-layout, .rz-body, .rz-body-content, .smartik-body-content {
         display: block !important;
-        position: relative !important;
+        visibility: visible !important;
         background: #ffffff !important;
-        box-shadow: none !important;
+        color: #000000 !important;
         padding: 0 !important;
         margin: 0 !important;
-    }
-
-    .rz-body, .rz-body-content {
-        display: block !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
         width: 100% !important;
         height: auto !important;
-        background: #ffffff !important;
         position: static !important;
     }
 
-    .rz-card.notebook-grid.print-sheet {
+    /* 3. Оставляем карточку бланка видимой, убирая тени и границы */
+    .print-sheet {
         display: block !important;
         visibility: visible !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
         background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
         width: 100% !important;
-        max-width: 100% !important;
     }
 
+    /* 4. Нейтрализуем внутреннюю flex-сетку Radzen Row */
     .rz-row {
-        display: flex !important;
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
+        display: block !important;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    .rz-col {
-        display: block !important;
-        flex: 0 0 25% !important;
-        max-width: 25% !important;
-        box-sizing: border-box !important;
-        padding: 0.5rem !important;
+        /* 5. Выстраиваем div колонок примеров в жесткую печатную сетку (по 4 в ряд) */
+        .rz-row > div {
+            display: inline-block !important;
+            visibility: visible !important;
+            box-sizing: border-box !important;
+            width: 24% !important;
+            margin: 0 !important;
+            padding: 15px 5px !important;
+            vertical-align: top !important;
+        }
+
+    /* 6. Открываем внутренний стек примера */
+    .rz-stack {
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        visibility: visible !important;
     }
 
     div.math-expr {
         display: inline-flex !important;
-        width: 120px !important;
+        width: auto !important;
         gap: 8px !important;
     }
 
@@ -230,9 +247,10 @@ span.equals-sign {
         margin-right: 10px !important;
     }
 
-    /* Превращаем квадраты в аккуратные нижние линии на печати для обоих видов полей */
-    .rz-stack .rz-numeric.child-answer-input,
-    .rz-stack .rz-textbox.child-answer-input {
+    /* 7. Превращаем Radzen-инпут в линию подчёркивания для карандаша */
+    .child-answer-input {
+        display: inline-flex !important;
+        visibility: visible !important;
         border: none !important;
         border-bottom: 2px solid #000000 !important;
         background: transparent !important;
@@ -242,12 +260,11 @@ span.equals-sign {
         max-width: 65px !important;
         min-width: 65px !important;
         height: 35px !important;
-        display: inline-flex !important;
     }
 
-    .child-answer-input .rz-numeric-input,
-    .child-answer-input .rz-inputtext,
-    .child-answer-input input {
-        display: none !important;
-    }
+        /* 8. Скрываем текст, чтобы выводился пустой бланк */
+        .child-answer-input input,
+        .child-answer-input .rz-inputtext {
+            display: none !important;
+        }
 }
