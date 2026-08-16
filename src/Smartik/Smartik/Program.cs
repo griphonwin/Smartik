@@ -11,6 +11,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddRadzenComponents();
 builder.Services.AddScoped<IMathGeneratorService, MathGeneratorService>();
 builder.Services.AddScoped<ILogicGeneratorService, LogicGeneratorService>();
+builder.Services.AddScoped<IPrintService, PrintService>();
 
 var app = builder.Build();
 

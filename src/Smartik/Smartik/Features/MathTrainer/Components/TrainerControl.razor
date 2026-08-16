@@ -53,7 +53,7 @@
                 {
                     <RadzenButton Click="OnResetClick" Text="Новая тренировка" Icon="refresh" ButtonStyle="ButtonStyle.Secondary" Class="rz-w-100" />
                 }
-                <RadzenButton Click="OnPrintClick" Text="Печать" Icon="print" ButtonStyle="ButtonStyle.Info" Style="min-width: 110px;" />
+                <TrainerPrintButton Style="min-width: 110px;" />
             </RadzenStack>
         </RadzenColumn>
 
@@ -74,7 +74,6 @@
     [Parameter] public EventCallback OnCheck { get; set; }
     [Parameter] public EventCallback OnReset { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
-    [Parameter] public EventCallback OnPrint { get; set; }
 
     protected string? SelectedPreset { get; set; }
 
@@ -123,7 +122,6 @@
     private async Task OnCheckClick() => await OnCheck.InvokeAsync();
     private async Task OnResetClick() { UpdatePresetSelection(); await OnReset.InvokeAsync(); }
     private async Task OnCancelClick() { UpdatePresetSelection(); await OnCancel.InvokeAsync(); }
-    private async Task OnPrintClick() => await OnPrint.InvokeAsync();
 
     // Вспомогательный DTO класс для пресетов
     public record TrainerPreset(string Id, string Text, int DefaultCount, int DefaultMaxNumber);

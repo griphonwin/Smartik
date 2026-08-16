@@ -13,8 +13,7 @@
                     OnStart="HandleStart"
                     OnCheck="CheckAnswers"
                     OnReset="ResetForm"
-                    OnCancel="CancelTest"
-                    OnPrint="PrintPage" />
+                    OnCancel="CancelTest" />
 </div>
 
 <TrainerResultAlert IsChecked="IsChecked" CorrectCount="_correctCount" TotalCount="Count" TimerText="@_timerText" />
@@ -133,7 +132,6 @@ else
 
     private void ResetForm() { _isStarted = false; IsChecked = false; _correctCount = 0; _timerText = "00:00"; Items.Clear(); }
     private void CancelTest() { _timer?.Stop(); ResetForm(); }
-    private async Task PrintPage() => await JsRuntime.InvokeVoidAsync("window.mathTrainer.triggerPrint");
 
     public void Dispose() { _timer?.Dispose(); GC.SuppressFinalize(this); }
 }

@@ -1,7 +1,3 @@
-/* ==========================================================================
-   GLOBAL APP STYLES - SMARTIK PROJECT (.NET 10 BLAZOR SERVER + RADZEN 11)
-   ========================================================================== */
-
 h1:focus {
     outline: none;
 }
@@ -38,10 +34,6 @@ h1:focus {
     visibility: hidden !important;
 }
 
-/* ==========================================================================
-   СТРУКТУРА ГЛАВНОГО КАРКАСА (MAIN LAYOUT)
-   ========================================================================== */
-
 .smartik-global-layout {
     grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body' !important;
     grid-template-columns: auto 1fr !important;
@@ -55,19 +47,11 @@ h1:focus {
     width: 100% !important;
 }
 
-/* ==========================================================================
-   ИНТЕРФЕЙС ГЛАВНОЙ СТРАНИЦЫ DASHBOARD
-   ========================================================================== */
-
 .home-card-interactive:hover {
     transform: translateY(-4px) !important;
     box-shadow: var(--rz-shadow-6) !important;
     border-color: var(--rz-primary) !important;
 }
-
-/* ==========================================================================
-   ИНТЕРФЕЙС ТРЕНАЖЕРОВ - ОТОБРАЖЕНИЕ НА ЭКРАНЕ
-   ========================================================================== */
 
 .rz-card.notebook-grid {
     background-size: 25px 25px !important;
@@ -114,7 +98,6 @@ span.equals-sign {
     margin-right: 12px !important;
 }
 
-/* КЛЕТКИ ВВОДА INPUT */
 .rz-stack .rz-numeric.child-answer-input,
 .rz-stack .rz-textbox.child-answer-input {
     display: inline-flex !important;
@@ -168,12 +151,9 @@ span.equals-sign {
     text-transform: none !important;
 }
 
-/* ==========================================================================
-   БЕЗУПРЕЧНЫЕ СТИЛИ ПЕЧАТИ (БЕЗ СКРЫТИЯ СИСТЕМНЫХ КЛАССОВ RADZEN)
-   ========================================================================== */
 @media print {
-    /* 1. Скрываем строго по уникальным классам навигации и тулбара */
-    .rz-header, .rz-sidebar, .hide-on-print, .rz-alert, .rz-selectbar, .rz-button, header, aside, h1 {
+    .rz-header, .rz-sidebar, .hide-on-print, .rz-alert, .rz-selectbar, .rz-button, header, aside, h1, .rz-progressbar,
+    .single-trainer-card .rz-button, .notebook-grid .rz-button {
         display: none !important;
         height: 0 !important;
         width: 0 !important;
@@ -182,9 +162,9 @@ span.equals-sign {
         overflow: hidden !important;
     }
 
-    /* 2. Принудительно раскрываем и делаем видимыми контейнеры макета */
     html, body, .rz-layout, .rz-body, .rz-body-content, .smartik-body-content {
         display: block !important;
+        position: static !important;
         visibility: visible !important;
         background: #ffffff !important;
         color: #000000 !important;
@@ -195,8 +175,7 @@ span.equals-sign {
         position: static !important;
     }
 
-    /* 3. Оставляем карточку бланка видимой, убирая тени и границы */
-    .print-sheet {
+    .print-sheet, .rz-card.notebook-grid {
         display: block !important;
         visibility: visible !important;
         border: none !important;
@@ -207,50 +186,32 @@ span.equals-sign {
         width: 100% !important;
     }
 
-    /* 4. Нейтрализуем внутреннюю flex-сетку Radzen Row */
     .rz-row {
-        display: block !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
         width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
     }
 
-        /* 5. Выстраиваем div колонок примеров в жесткую печатную сетку (по 4 в ряд) */
-        .rz-row > div {
-            display: inline-block !important;
-            visibility: visible !important;
+        .rz-row > .rz-col-12,
+        .rz-row > div[class*="rz-col"] {
+            display: block !important;
+            flex: 0 0 25% !important;
+            max-width: 25% !important;
             box-sizing: border-box !important;
-            width: 24% !important;
-            margin: 0 !important;
-            padding: 15px 5px !important;
-            vertical-align: top !important;
+            padding: 12px 10px !important;
         }
 
-    /* 6. Открываем внутренний стек примера */
-    .rz-stack {
-        display: inline-flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: flex-start !important;
-        visibility: visible !important;
+    .rz-stack .math-expr span,
+    .rz-stack .equals-sign {
+        font-size: 2.2rem !important;
+        font-weight: bold !important;
+        color: #000000 !important;
     }
 
-    div.math-expr {
+    .rz-stack div[class*="child-answer-input"],
+    .rz-stack .child-answer-input {
         display: inline-flex !important;
-        width: auto !important;
-        gap: 8px !important;
-    }
-
-    span.equals-sign {
-        display: inline-block !important;
-        width: 20px !important;
-        margin-right: 10px !important;
-    }
-
-    /* 7. Превращаем Radzen-инпут в линию подчёркивания для карандаша */
-    .child-answer-input {
-        display: inline-flex !important;
-        visibility: visible !important;
         border: none !important;
         border-bottom: 2px solid #000000 !important;
         background: transparent !important;
@@ -262,9 +223,59 @@ span.equals-sign {
         height: 35px !important;
     }
 
-        /* 8. Скрываем текст, чтобы выводился пустой бланк */
-        .child-answer-input input,
-        .child-answer-input .rz-inputtext {
-            display: none !important;
+    .single-trainer-card {
+        margin: 6rem auto !important;
+        max-width: 650px !important;
+    }
+
+        .single-trainer-card .rz-stack {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            gap: 1.5rem !important;
         }
+
+        .single-trainer-card .math-expr span,
+        .single-trainer-card span {
+            font-size: 3.5rem !important;
+            font-weight: bold !important;
+            font-family: 'Consolas', monospace !important;
+            color: #000000 !important;
+        }
+
+        .single-trainer-card .child-answer-input {
+            border-bottom: 4px solid #000000 !important;
+            width: 100px !important;
+            max-width: 100px !important;
+            min-width: 100px !important;
+            height: 55px !important;
+        }
+
+        .single-trainer-card div[id*="wrkrdON37k"],
+        .single-trainer-card div[class*="rz-stack"][style*="dashed"],
+        .rz-stack[style*="dashed"] {
+            display: inline-block !important;
+            visibility: visible !important;
+            width: 55px !important;
+            height: 55px !important;
+            min-width: 55px !important;
+            min-height: 55px !important;
+            border: 3px solid #000000 !important;
+            border-radius: 50% !important;
+            background: transparent !important;
+            margin: 0 10px !important;
+            padding: 0 !important;
+        }
+
+    .child-answer-input input,
+    .child-answer-input .rz-inputtext,
+    .rz-textbox {
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        display: none !important;
+        opacity: 0 !important;
+    }
 }

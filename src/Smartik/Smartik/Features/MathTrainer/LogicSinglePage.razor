@@ -26,7 +26,8 @@
         {
             var item = _examples[currentIndex];
 
-            <RadzenCard @key="item" Class="notebook-grid rz-p-8 rz-shadow-3 rz-text-align-center hide-on-print" Style="max-width: 600px; margin: 2rem auto; border: 3px solid var(--rz-info-light) !important; border-radius: 16px !important; width: 100%;">
+            @* 👑 ИСПРАВЛЕНО: Убрали класс hide-on-print из Class карточки! 👑 *@
+            <RadzenCard @key="item" Class="notebook-grid rz-p-8 rz-shadow-3 rz-text-align-center single-trainer-card" Style="max-width: 600px; margin: 2rem auto; border: 3px solid var(--rz-info-light) !important; border-radius: 16px !important; width: 100%;">
                 <RadzenStack AlignItems="AlignItems.Center" Gap="2rem">
 
                     <div style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
@@ -43,7 +44,7 @@
                                 <span style="font-weight: bold; font-family: 'Consolas', monospace; width: 50px; text-align: center;">@item.LeftText</span>
                             }
 
-                            <!-- ЗНАК СРАВНЕНИЯ (ИСПРАВЛЕНО: Теперь передаем точный строковый знак в параметры!) -->
+                            <!-- ЗНАК СРАВНЕНИЯ -->
                             @if (item.HiddenPosition == 1)
                             {
                                 <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" Style="border: 2px dashed var(--rz-info-light); padding: 0.5rem; border-radius: 12px; background: #f8fafc;">
@@ -118,7 +119,7 @@
 </TrainerSingleLayout>
 
 @code {
-    private int _count = 20; private int _maxNumber = 20;
+    private int _count = 12; private int _maxNumber = 10;
     private List<LogicExample> _examples = [];
     private List<ITrainerItem> _items = [];
     private TrainerSingleLayout? _layoutRef;

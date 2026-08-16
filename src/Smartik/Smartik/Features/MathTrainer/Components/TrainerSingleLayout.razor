@@ -13,8 +13,7 @@
                     OnStart="HandleStart"
                     OnCheck="CheckAnswers"
                     OnReset="ResetForm"
-                    OnCancel="CancelTest"
-                    OnPrint="(() => {})" />
+                    OnCancel="CancelTest" />
 </div>
 
 <TrainerResultAlert IsChecked="_isChecked" CorrectCount="_correctCount" TotalCount="Count" TimerText="@_timerText" />
@@ -53,7 +52,7 @@
         <RadzenProgressBar Value="@_progressValue" Max="100" ShowValue="false" ProgressBarStyle="ProgressBarStyle.Success" Style="height: 10px; border-radius: 5px;" />
     </RadzenStack>
 
-    <RadzenCard Class="notebook-grid rz-p-8 rz-shadow-3 rz-text-align-center hide-on-print" Style="max-width: 600px; margin: 2rem auto; border: 3px solid var(--rz-primary-light) !important; border-radius: 16px !important; width: 100%;">
+    <RadzenCard Class="notebook-grid rz-p-8 rz-shadow-3 rz-text-align-center single-trainer-card" Style="max-width: 600px; margin: 2rem auto; border: 3px solid var(--rz-primary-light) !important; border-radius: 16px !important; width: 100%;">
         <RadzenStack AlignItems="AlignItems.Center" Gap="2rem">
 
             @ChildContent(_currentIndex)
@@ -62,6 +61,7 @@
                           Text="@(_currentIndex + 1 == Count ? "Завершить 🎉" : "Далее 👉")"
                           ButtonStyle="ButtonStyle.Primary"
                           Size="ButtonSize.Large"
+                          Class="hide-on-print"
                           Style="min-width: 180px; font-size: 1.2rem; font-weight: bold; border-radius: 12px;" />
         </RadzenStack>
     </RadzenCard>

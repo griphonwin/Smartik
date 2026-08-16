@@ -1,0 +1,38 @@
+﻿@using Smartik.Features.MathTrainer.Services
+@inject IPrintService PrintService
+
+<!-- 🌟 Универсальная кнопка печати Смартика 🌟 -->
+<RadzenButton Click="ExecutePrint"
+              Text="@Text"
+              Icon="@Icon"
+              ButtonStyle="@ButtonStyle"
+              Variant="@Variant"
+              Size="@Size"
+              Class="@($"{Class} hide-on-print")"
+              Style="@Style" />
+
+@code {
+    // Параметры для кастомизации кнопки, если где-то захочется изменить её внешний вид
+    [Parameter] public string Text { get; set; } = "Печать";
+    [Parameter] public string Icon { get; set; } = "print";
+    [Parameter] public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Info;
+    [Parameter] public Variant Variant { get; set; } = Variant.Filled;
+    [Parameter] public ButtonSize Size { get; set; } = ButtonSize.Medium;
+    [Parameter] public string Class { get; set; } = string.Empty;
+    [Parameter] public string Style { get; set; } = string.Empty;
+
+    // Колбэк на случай, если родительской странице нужно узнать о факте нажатия кнопки
+    [Parameter] public EventCallback OnPrintClicked { get; set; }
+
+    private async Task ExecutePrint()
+    {
+        // 1. Уведомляем родителя, если это необходимо
+        if (OnPrintClicked.HasDelegate)
+        {
+            await OnPrintClicked.InvokeAsync();
+        }
+
+        // 2. Нативно вызываем C# сервис печати без костылей и JS в разметке!
+        await PrintService.TriggerPrintAsync();
+    }
+}
