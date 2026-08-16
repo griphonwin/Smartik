@@ -1,0 +1,36 @@
+﻿@if (IsChecked)
+{
+    <div class="hide-on-print rz-mb-6">
+        <RadzenCard Variant="Variant.Flat"
+                    Style="@(CorrectCount == TotalCount
+                                         ? "background-color: var(--rz-success-lighter); border: 2px solid var(--rz-success); border-radius: 12px;"
+                                         : "background-color: var(--rz-warning-lighter); border: 2px solid var(--rz-warning); border-radius: 12px;")"
+                    Class="rz-p-5">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="2rem" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
+                <RadzenIcon Icon="@(CorrectCount == TotalCount ? "sentiment_very_satisfied" : "mood")"
+                            Style="@(CorrectCount == TotalCount ? "font-size: 5rem; color: var(--rz-success-dark);" : "font-size: 5rem; color: var(--rz-warning-dark);")" />
+                <RadzenStack Gap="0.5rem" Class="rz-text-align-center rz-text-align-sm-left">
+                    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" Style="@(CorrectCount == TotalCount ? "color: var(--rz-success-dark); font-weight: 800;" : "color: var(--rz-warning-dark); font-weight: 800;")" Class="rz-m-0">
+                        @(CorrectCount == TotalCount ? "🎉 ОТЛИЧНО! ВСЁ ПРАВИЛЬНО!" : "👍 ПРОВЕРКА ЗАВЕРШЕНА!")
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.P" Style="color: #1e293b; font-weight: 600; font-family: 'Consolas', monospace;" Class="rz-m-0">
+                        Правильно решено: <span style="font-size: 2rem; color: var(--rz-primary);">@CorrectCount</span> из <strong>@TotalCount</strong> за время: <span style="font-size: 2rem; color: var(--rz-primary);">@TimerText</span>
+                    </RadzenText>
+                    @if (CorrectCount == TotalCount)
+                    {
+                        <RadzenText TextStyle="TextStyle.Body1" Style="color: #475569; font-style: italic;" Class="rz-m-0">
+                            🌟 Ты настоящий superpower-умник Смартика! Так держать! 🌟
+                        </RadzenText>
+                    }
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsChecked { get; set; }
+    [Parameter] public int CorrectCount { get; set; }
+    [Parameter] public int TotalCount { get; set; }
+    [Parameter] public string TimerText { get; set; } = "00:00";
+}

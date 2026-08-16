@@ -1,0 +1,30 @@
+﻿@page "/Error"
+@namespace Smartik.Components.Pages
+@using System.Diagnostics
+
+<PageTitle>Ошибка</PageTitle>
+
+<RadzenCard Variant="Variant.Filled" Class="rz-my-12 rz-mx-auto rz-p-8" Style="max-width: 600px; background-color: var(--rz-danger-lighter)">
+    <RadzenStack AlignItems="AlignItems.Center" Class="rz-text-align-center">
+        <RadzenIcon Icon="error" Style="font-size: 3rem" Class="rz-color-danger" />
+        <RadzenText TextStyle="TextStyle.H5" Class="rz-color-danger-dark font-weight-bold">Что-то пошло не так</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1">Произошла внутренняя ошибка приложения. Пожалуйста, попробуйте обновить страницу.</RadzenText>
+
+        @if (ShowRequestId)
+        {
+            <RadzenBadge BadgeStyle="BadgeStyle.Danger" IsPill="true" Text="@($"ID Ошибки: {RequestId}")" Class="rz-mt-4" />
+        }
+    </RadzenStack>
+</RadzenCard>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized()
+    {
+        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+    }
+}

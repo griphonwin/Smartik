@@ -1,0 +1,30 @@
+﻿<div id="components-reconnect-modal" class="my-reconnect-modal">
+    <div class="show">
+        <RadzenCard Variant="Variant.Filled" Style="position: fixed; top: 20px; right: 20px; z-index: 10001; width: 300px;" Class="rz-shadow-6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" Size="ProgressBarCircularSize.Small" />
+                <RadzenText TextStyle="TextStyle.Body2" Class="rz-m-0">Связь со Смартиком потеряна. Подключаемся...</RadzenText>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+    <div class="failed">
+        <RadzenCard Variant="Variant.Filled" Style="position: fixed; top: 20px; right: 20px; z-index: 10001; width: 300px; background-color: var(--rz-danger-lighter);" Class="rz-shadow-6">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                <RadzenIcon Icon="report_problem" Class="rz-color-danger" />
+                <RadzenStack Gap="0.25rem">
+                    <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-m-0 font-weight-bold">Ошибка сети</RadzenText>
+                    <RadzenButton Size="ButtonSize.Small" Text="Обновить страницу" ButtonStyle="ButtonStyle.Danger" Click="ReloadPage" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenCard>
+    </div>
+</div>
+
+@code {
+    [Inject] private IJSRuntime JsRuntime { get; set; } = default!;
+
+    private async Task ReloadPage()
+    {
+        await JsRuntime.InvokeVoidAsync("window.location.reload");
+    }
+}

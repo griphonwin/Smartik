@@ -1,0 +1,253 @@
+/* ==========================================================================
+   GLOBAL APP STYLES - SMARTIK PROJECT (.NET 10 BLAZOR SERVER + RADZEN 11)
+   ========================================================================== */
+
+h1:focus {
+    outline: none;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid #e50000;
+}
+
+.validation-message {
+    color: #e50000;
+}
+
+.blazor-error-boundary {
+    background: url("data:image/svg+xml;utf8,<svg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://w3.org'><path d='M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z' fill='%23FFE500'/><path d='M12 7V13' stroke='%23B32121' stroke-width='2' stroke-linecap='round'/><path d='M12 16.5V17' stroke='%23B32121' stroke-width='2' stroke-linecap='round'/></svg>") no-repeat 1rem/1.8rem, #b32121;
+    padding: 1rem 1rem 1rem 3.7rem;
+    color: white;
+}
+
+    .blazor-error-boundary::after {
+        content: "Произошла системная ошибка приложения Smartik.";
+    }
+
+.darker-border-checkbox.form-check-input {
+    border-color: #929292;
+}
+
+#components-reconnect-modal {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* ==========================================================================
+   ИНТЕРФЕЙС ГЛАВНОЙ СТРАНИЦЫ DASHBOARD
+   ========================================================================== */
+
+.home-card-interactive:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--rz-shadow-6) !important;
+    border-color: var(--rz-primary) !important;
+}
+
+/* ==========================================================================
+   ИНТЕРФЕЙС ТРЕНАЖЕРОВ - ОТОБРАЖЕНИЕ НА ЭКРАНЕ
+   ========================================================================== */
+
+.rz-card.notebook-grid {
+    background-size: 25px 25px !important;
+    background-image: linear-gradient(to right, #e0e0e0 1px, transparent 1px), linear-gradient(to bottom, #e0e0e0 1px, transparent 1px) !important;
+    background-color: #ffffff !important;
+    border: 2px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+}
+
+div.math-expr {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 12px !important;
+    width: auto !important;
+    font-size: 2.2rem !important;
+    font-weight: bold !important;
+    font-family: 'Consolas', 'Courier New', monospace !important;
+    color: #334155 !important;
+}
+
+    div.math-expr span {
+        display: inline-block !important;
+        text-align: center !important;
+    }
+
+        div.math-expr span.num-val {
+            width: 35px !important;
+        }
+
+        div.math-expr span.op-val {
+            width: 25px !important;
+        }
+
+span.equals-sign {
+    font-size: 2.2rem !important;
+    font-weight: bold !important;
+    font-family: 'Consolas', 'Courier New', monospace !important;
+    color: #334155 !important;
+    white-space: nowrap !important;
+    display: inline-block !important;
+    width: 25px !important;
+    text-align: center !important;
+    margin-right: 12px !important;
+}
+
+/* 🌟 ИСПРАВЛЕНО ДЛЯ RADZEN 11: Применяем жесткие рамки квадратов И для Numeric, И для TextBox 🌟 */
+.rz-stack .rz-numeric.child-answer-input,
+.rz-stack .rz-textbox.child-answer-input {
+    display: inline-flex !important;
+    width: 75px !important;
+    max-width: 75px !important;
+    min-width: 75px !important;
+    height: 48px !important;
+    border: 2px solid #94a3b8 !important;
+    border-radius: 6px !important;
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    transition: all 0.2s ease-in-out;
+}
+
+    /* Лазурная неоновая подсветка активной клетки при фокусе курсора */
+    .rz-stack .rz-numeric.child-answer-input:focus-within,
+    .rz-stack .rz-textbox.child-answer-input:focus-within {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.25) !important;
+        background-color: #f8fafc !important;
+    }
+
+/* Тотальное выравнивание шрифтов по центру во всех внутренних инпутах Radzen 11 */
+.child-answer-input .rz-numeric-input,
+.child-answer-input .rz-inputtext,
+.child-answer-input input {
+    font-family: 'Consolas', 'Courier New', monospace !important;
+    font-size: 1.8rem !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    padding: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* 🌟 ИСПРАВЛЕНО: Тотальное и гарантированное уничтожение стрелочек ▲ ▼ во всех проявлениях */
+.child-answer-input button.rz-numeric-button,
+.child-answer-input .rz-numeric-button,
+.child-answer-input button,
+.child-answer-input .rz-spinner-buttons,
+.rz-spinner-button,
+.rz-numeric-button {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.rz-button .rz-button-box::after,
+.rz-button span[style*="uppercase"] {
+    display: none !important;
+    text-transform: none !important;
+}
+
+/* ==========================================================================
+   БЕЗУПРЕЧНЫЕ СТИЛИ ДЛЯ ВЫГРУЗКИ НА ПЕЧАТЬ
+   ========================================================================== */
+@media print {
+    .rz-header, .rz-sidebar, .hide-on-print, .rz-card.rz-variant-filled, .rz-alert, h1, header, aside, .rz-selectbar, label {
+        display: none !important;
+        height: 0 !important;
+        width: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .rz-layout {
+        display: block !important;
+        position: relative !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .rz-body, .rz-body-content {
+        display: block !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #ffffff !important;
+        position: static !important;
+    }
+
+    .rz-card.notebook-grid.print-sheet {
+        display: block !important;
+        visibility: visible !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .rz-row {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .rz-col {
+        display: block !important;
+        flex: 0 0 25% !important;
+        max-width: 25% !important;
+        box-sizing: border-box !important;
+        padding: 0.5rem !important;
+    }
+
+    div.math-expr {
+        display: inline-flex !important;
+        width: 120px !important;
+        gap: 8px !important;
+    }
+
+    span.equals-sign {
+        display: inline-block !important;
+        width: 20px !important;
+        margin-right: 10px !important;
+    }
+
+    /* Превращаем квадраты в аккуратные нижние линии на печати для обоих видов полей */
+    .rz-stack .rz-numeric.child-answer-input,
+    .rz-stack .rz-textbox.child-answer-input {
+        border: none !important;
+        border-bottom: 2px solid #000000 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        width: 65px !important;
+        max-width: 65px !important;
+        min-width: 65px !important;
+        height: 35px !important;
+        display: inline-flex !important;
+    }
+
+    .child-answer-input .rz-numeric-input,
+    .child-answer-input .rz-inputtext,
+    .child-answer-input input {
+        display: none !important;
+    }
+}

@@ -1,0 +1,139 @@
+﻿@using Smartik.Features.MathTrainer.Models
+@using System.Timers
+@implements IDisposable
+@inject IJSRuntime JsRuntime
+
+<div class="hide-on-print">
+    <TrainerControl @bind-Count="Count"
+                    @bind-MaxNumber="MaxNumber"
+                    IsStarted="_isStarted"
+                    IsChecked="IsChecked"
+                    TimerText="@_timerText"
+                    Presets="Presets"
+                    OnStart="HandleStart"
+                    OnCheck="CheckAnswers"
+                    OnReset="ResetForm"
+                    OnCancel="CancelTest"
+                    OnPrint="PrintPage" />
+</div>
+
+<TrainerResultAlert IsChecked="IsChecked" CorrectCount="_correctCount" TotalCount="Count" TimerText="@_timerText" />
+
+@if (_isStarted && Items.Count > 0)
+{
+    <RadzenCard Class="notebook-grid rz-p-6 rz-shadow-2 print-sheet">
+        <RadzenRow RowGap="1.5rem" ColumnGap="1rem">
+            @ChildContent
+        </RadzenRow> @* ИСПРАВЛЕНО: Раньше тут стоял неверный тег RadzenCard *@
+    </RadzenCard>
+}
+else
+{
+    @PlaceholderContent
+}
+
+@code {
+    [Parameter] public int Count { get; set; } = 12;
+    [Parameter] public EventCallback<int> CountChanged { get; set; }
+    [Parameter] public int MaxNumber { get; set; } = 10;
+    [Parameter] public EventCallback<int> MaxNumberChanged { get; set; }
+
+    [Parameter] public List<TrainerControl.TrainerPreset> Presets { get; set; } = [];
+    [Parameter] public List<ITrainerItem> Items { get; set; } = [];
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public RenderFragment? PlaceholderContent { get; set; }
+    [Parameter] public Func<Task>? OnGenerateRequired { get; set; }
+    [Parameter] public Func<Task>? OnFirstInputFocusRequired { get; set; }
+
+    public bool IsChecked { get; set; } = false;
+
+    protected bool _isStarted = false;
+    protected int _correctCount = 0;
+    protected string _timerText = "00:00";
+
+    private Timer? _timer;
+    private int _secondsElapsed = 0;
+    private bool _shouldLaunchConfetti = false;
+    private bool _shouldFocusFirstInput = false;
+
+    protected override void OnInitialized()
+    {
+        _timer = new Timer(1000);
+        _timer.Elapsed += OnTimerElapsed;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_shouldFocusFirstInput && OnFirstInputFocusRequired != null)
+        {
+            _shouldFocusFirstInput = false;
+            await OnFirstInputFocusRequired.Invoke();
+        }
+
+        if (_shouldLaunchConfetti)
+        {
+            _shouldLaunchConfetti = false;
+            await JsRuntime.InvokeVoidAsync("window.mathTrainer.launchConfetti");
+        }
+    }
+
+    private async Task HandleStart()
+    {
+        await CountChanged.InvokeAsync(Count);
+        await MaxNumberChanged.InvokeAsync(MaxNumber);
+
+        // Переключаем системные флаги старта
+        IsChecked = false;
+        _correctCount = 0;
+        _secondsElapsed = 0;
+        _timerText = "00:00";
+        _shouldLaunchConfetti = false;
+        _isStarted = true;
+        _shouldFocusFirstInput = true;
+
+        if (OnGenerateRequired != null)
+        {
+            await OnGenerateRequired.Invoke();
+        }
+
+        // Запускаем секундомер
+        _timer?.Start();
+
+        // Принудительно заставляем Blazor Server моментально перерисовать тетрадный лист на экране
+        await InvokeAsync(StateHasChanged);
+    }
+
+
+
+    private void OnTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        _secondsElapsed++;
+        _timerText = TimeSpan.FromSeconds(_secondsElapsed).ToString(@"mm\:ss");
+        InvokeAsync(StateHasChanged);
+    }
+
+    public async Task TriggerInputChanged()
+    {
+        if (Items.All(e => !string.IsNullOrWhiteSpace(e.UserAnswer)))
+        {
+            await CheckAnswers();
+        }
+    }
+
+    public async Task CheckAnswers()
+    {
+        if (IsChecked) return;
+        await Task.Delay(60);
+        _timer?.Stop();
+
+        _correctCount = Items.Count(e => e.IsCorrect);
+        IsChecked = true; _shouldLaunchConfetti = true;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ResetForm() { _isStarted = false; IsChecked = false; _correctCount = 0; _timerText = "00:00"; Items.Clear(); }
+    private void CancelTest() { _timer?.Stop(); ResetForm(); }
+    private async Task PrintPage() => await JsRuntime.InvokeVoidAsync("window.mathTrainer.triggerPrint");
+
+    public void Dispose() { _timer?.Dispose(); GC.SuppressFinalize(this); }
+}

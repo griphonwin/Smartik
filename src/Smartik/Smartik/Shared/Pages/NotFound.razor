@@ -1,0 +1,15 @@
+﻿@page "/not-found"
+@namespace Smartik.Shared.Pages
+
+<PageTitle>Страница не найдена</PageTitle>
+
+<RadzenCard Variant="Variant.Outlined" Class="rz-my-12 rz-mx-auto rz-p-12" Style="max-width: 500px; text-align: center;">
+    <RadzenIcon Icon="error_outline" Style="font-size: 4rem;" Class="rz-color-danger rz-mb-4" />
+    <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-mb-2">Ой! Ошибка 404</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" Class="rz-mb-6">Упс, такой странички у Смартика еще нет.</RadzenText>
+    <RadzenButton Text="Вернуться на главную" Icon="home" ButtonStyle="ButtonStyle.Primary" Click="@(() => NavigationManager.NavigateTo("/"))" />
+</RadzenCard>
+
+@code {
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+}

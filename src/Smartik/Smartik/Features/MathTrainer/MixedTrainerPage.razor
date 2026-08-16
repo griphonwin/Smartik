@@ -1,0 +1,76 @@
+﻿@page "/trainer/mixed"
+@using Smartik.Features.MathTrainer.Components
+@using Smartik.Features.MathTrainer.Models
+@using Smartik.Features.MathTrainer.Services
+@inject IMathGeneratorService GeneratorService
+
+<RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-mb-4 hide-on-print">📝 Решаем примеры</RadzenText>
+
+<TrainerBaseLayout @bind-Count="_count" @bind-MaxNumber="_maxNumber" Presets="_mathPresets" Items="_items" OnGenerateRequired="GenerateItems" OnFirstInputFocusRequired="FocusFirst" @ref="_layoutRef">
+    <PlaceholderContent>
+        <RadzenCard Variant="Variant.Outlined" Class="rz-my-6 rz-p-12 hide-on-print" Style="text-align: center; border: 2px dashed #94a3b8;">
+            <RadzenIcon Icon="play_lesson" Style="font-size: 4rem; color: var(--rz-text-secondary-color);" Class="rz-mb-4" />
+            <RadzenText TextStyle="TextStyle.H5" Class="rz-mb-2">Готовы к математической разминке?</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-text-secondary">Нажмите кнопку <strong>«Начать тренировку»</strong>!</RadzenText>
+        </RadzenCard>
+    </PlaceholderContent>
+    <ChildContent>
+        @for (int i = 0; i < _examples.Count; i++)
+        {
+            var index = i; var item = _examples[index];
+            <RadzenColumn Size="12" SizeMd="6" SizeXl="3">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Style="flex-wrap: nowrap;">
+                    <div class="math-expr"><span class="num-val">@item.FirstOperand</span><span class="op-val">@(_operatorMapping[item.Operator])</span><span class="num-val">@item.SecondOperand</span></div>
+                    <span class="equals-sign">=</span>
+                    <RadzenTextBox @bind-Value="item.UserAnswer"
+                                   @bind-Value:after="_layoutRef!.TriggerInputChanged"
+                                   ValueOnInput="true"
+                                   @ref="_inputRefs[index]"
+                                   @onkeydown="@(e => HandleKeyDown(e, index))"
+                                   Disabled="@(_layoutRef?.IsChecked ?? false)"
+                                   Class="child-answer-input"
+                                   Style="@GetStyle(item)"
+                                   InputAttributes="@_inputAttrs"
+                                   MaxLength="3" />
+                </RadzenStack>
+            </RadzenColumn>
+        }
+    </ChildContent>
+</TrainerBaseLayout>
+
+@code {
+    private int _count = 20; private int _maxNumber = 20;
+    private List<MathExample> _examples = [];
+    private List<ITrainerItem> _items = [];
+    private TrainerBaseLayout? _layoutRef;
+    private Dictionary<int, RadzenTextBox> _inputRefs = [];
+    private readonly Dictionary<string, string> _operatorMapping = new() { { "+", "+" }, { "-", "−" } };
+    private readonly Dictionary<string, object> _inputAttrs = new() { { "style", "text-align: center; font-size: 1.8rem; font-weight: bold; font-family: 'Consolas', monospace;" }, { "inputmode", "decimal" } };
+    private readonly List<TrainerControl.TrainerPreset> _mathPresets = [new("3-4", "👶 3-4 года (до 5)", 6, 5), new("4-5", "👦 4-5 лет (до 10)", 12, 10), new("5-6", "🚀 5-6 лет (до 20)", 16, 20), new("6-7", "🎓 6-7 лет (профи)", 20, 20)];
+
+    private Task GenerateItems()
+    {
+        _examples = [.. GeneratorService.GenerateMixedExamples(_count, _maxNumber)];
+        _items = [.. _examples];
+        _inputRefs.Clear();
+        return Task.CompletedTask;
+    }
+
+
+    private async Task FocusFirst()
+    {
+        if (_inputRefs.TryGetValue(0, out var input) && input != null) await input.FocusAsync();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e, int current)
+    {
+        if ((e.Key == "Enter" || e.Key == "Tab") && _layoutRef != null)
+        {
+            if (current + 1 < _examples.Count && _inputRefs.TryGetValue(current + 1, out var nextInput) && nextInput != null)
+                await nextInput.FocusAsync();
+            else
+                await _layoutRef.CheckAnswers();
+        }
+    }
+    private string GetStyle(MathExample e) => $"text-align: center; font-size: 1.8rem; font-weight: bold; font-family: 'Consolas', monospace; width: 75px; height: 48px; box-shadow: none !important; {(_layoutRef != null && _layoutRef.IsChecked ? (e.IsCorrect ? "border-color:#22c55e!important;background-color:#f0fdf4!important;color:#16a34a!important;" : "border-color:#ef4444!important;background-color:#fef2f2!important;color:#dc2626!important;") : "")}";
+}

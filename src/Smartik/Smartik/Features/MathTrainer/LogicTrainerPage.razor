@@ -1,0 +1,126 @@
+﻿@page "/trainer/logic"
+@using Smartik.Features.MathTrainer.Components
+@using Smartik.Features.MathTrainer.Models
+@using Smartik.Features.MathTrainer.Services
+@inject ILogicGeneratorService LogicService
+
+<RadzenText TextStyle="TextStyle.H4" TagName="TagName.H1" Class="rz-mb-4 hide-on-print">🧠 Логика и неравенства</RadzenText>
+
+<TrainerBaseLayout @bind-Count="_count" @bind-MaxNumber="_maxNumber" Presets="_logicPresets" Items="_items" OnGenerateRequired="GenerateItems" OnFirstInputFocusRequired="FocusFirst" @ref="_layoutRef">
+    <PlaceholderContent>
+        <RadzenCard Variant="Variant.Outlined" Class="rz-my-6 rz-p-12 hide-on-print" Style="text-align: center; border: 2px dashed #94a3b8;">
+            <RadzenIcon Icon="psychology" Style="font-size: 4rem; color: var(--rz-text-secondary-color);" Class="rz-mb-4" />
+            <RadzenText TextStyle="TextStyle.H5" Class="rz-mb-2">Готовы размять логику?</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body1" Class="rz-color-text-secondary">Нажмите кнопку <strong>«Начать тренировку»</strong>!</RadzenText>
+        </RadzenCard>
+    </PlaceholderContent>
+    <ChildContent>
+        @for (int i = 0; i < _examples.Count; i++)
+        {
+            var index = i; var item = _examples[index];
+            <RadzenColumn Size="12" SizeMd="6" SizeXl="3">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="flex-wrap: nowrap;">
+                    <div class="math-expr" style="width: auto; gap: 12px; display: inline-flex; align-items: center;">
+
+                        <!-- ПОЗИЦИЯ 0 (ЛЕВОЕ ЧИСЛО) -->
+                        @if (item.HiddenPosition == 0)
+                        {
+                            <!-- ИСПРАВЛЕНО: Заменили на безопасный вызов _layoutRef?.IsChecked -->
+                            <RadzenTextBox @bind-Value="item.UserAnswer"
+                                           @bind-Value:after="_layoutRef!.TriggerInputChanged"
+                                           ValueOnInput="true"
+                                           @ref="_inputRefs[index]"
+                                           @onkeydown="@(e => HandleKeyDown(e, index))"
+                                           Disabled="@(_layoutRef?.IsChecked ?? false)"
+                                           Class="child-answer-input"
+                                           Style="@GetStyle(item)"
+                                           InputAttributes="@_inputAttrs"
+                                           MaxLength="3" />
+                        }
+                        else
+                        {
+
+                            <span style="font-size:2.2rem;font-weight:bold;font-family:'Consolas',monospace;width:35px;text-align:center;">@item.LeftText</span>
+                        }
+
+                        <!-- ПОЗИЦИЯ 1 (ЗНАК СРАВНЕНИЯ) -->
+                        @if (item.HiddenPosition == 1)
+                        {
+                            <!-- ИСПРАВЛЕНО: Заменили на безопасный вызов _layoutRef?.IsChecked -->
+                            <RadzenTextBox @bind-Value="item.UserAnswer"
+                                           @bind-Value:after="_layoutRef!.TriggerInputChanged"
+                                           ValueOnInput="true"
+                                           @ref="_inputRefs[index]"
+                                           @onkeydown="@(e => HandleKeyDown(e, index))"
+                                           Disabled="@(_layoutRef?.IsChecked ?? false)"
+                                           Class="child-answer-input"
+                                           Style="@GetStyle(item)"
+                                           InputAttributes="@_inputAttrs"
+                                           MaxLength="1" />
+                        }
+                        else
+                        {
+
+                            <span style="font-size:2.2rem;font-weight:bold;font-family:'Consolas',monospace;width:25px;text-align:center;color:var(--rz-primary-dark);">@item.CorrectSign</span>
+                        }
+
+                        <!-- ПОЗИЦИЯ 2 (ПРАВОЕ ЧИСЛО) -->
+                        @if (item.HiddenPosition == 2)
+                        {
+                            <!-- ИСПРАВЛЕНО: Заменили на безопасный вызов _layoutRef?.IsChecked -->
+                            <RadzenTextBox @bind-Value="item.UserAnswer"
+                                           @bind-Value:after="_layoutRef!.TriggerInputChanged"
+                                           ValueOnInput="true"
+                                           @ref="_inputRefs[index]"
+                                           @onkeydown="@(e => HandleKeyDown(e, index))"
+                                           Disabled="@(_layoutRef?.IsChecked ?? false)"
+                                           Class="child-answer-input"
+                                           Style="@GetStyle(item)"
+                                           InputAttributes="@_inputAttrs"
+                                           MaxLength="3" />
+                        }
+                        else
+                        {
+
+                            <span style="font-size:2.2rem;font-weight:bold;font-family:'Consolas',monospace;width:35px;text-align:center;">@item.RightText</span>
+                        }
+
+                    </div>
+                </RadzenStack>
+            </RadzenColumn>
+        }
+    </ChildContent>
+</TrainerBaseLayout>
+
+@code {
+    private int _count = 20; private int _maxNumber = 20;
+    private List<LogicExample> _examples = [];
+    private List<ITrainerItem> _items = [];
+    private TrainerBaseLayout? _layoutRef;
+    private Dictionary<int, RadzenTextBox> _inputRefs = [];
+    private readonly Dictionary<string, object> _inputAttrs = new() { { "style", "text-align: center; font-size: 1.8rem; font-weight: bold; font-family: 'Consolas', monospace;" }, { "inputmode", "decimal" } };
+    private readonly List<TrainerControl.TrainerPreset> _logicPresets = [new("3-4", "👶 3-4 года (до 5)", 6, 5), new("4-5", "👦 4-5 лет (до 10)", 12, 10), new("5-6", "🚀 5-6 лет (до 15)", 16, 15), new("6-7", "🎓 6-7 лет (профи)", 20, 20)];
+
+    private Task GenerateItems()
+    {
+        _examples = [.. LogicService.GenerateLogicExamples(_count, _maxNumber)];
+        _items = [.. _examples]; _inputRefs.Clear(); return Task.CompletedTask;
+    }
+
+    private async Task FocusFirst()
+    {
+        if (_inputRefs.TryGetValue(0, out var input) && input != null) await input.FocusAsync();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e, int current)
+    {
+        if ((e.Key == "Enter" || e.Key == "Tab") && _layoutRef != null)
+        {
+            if (current + 1 < _examples.Count && _inputRefs.TryGetValue(current + 1, out var nextInput) && nextInput != null)
+                await nextInput.FocusAsync();
+            else
+                await _layoutRef.CheckAnswers();
+        }
+    }
+    private string GetStyle(LogicExample e) => $"text-align: center; font-size: 1.8rem; font-weight: bold; font-family: 'Consolas', monospace; width: 75px; height: 48px; box-shadow: none !important; {(_layoutRef != null && _layoutRef.IsChecked ? (e.IsCorrect ? "border-color:#22c55e!important;background-color:#f0fdf4!important;color:#16a34a!important;" : "border-color:#ef4444!important;background-color:#fef2f2!important;color:#dc2626!important;") : "")}";
+}

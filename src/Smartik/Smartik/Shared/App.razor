@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+
+    <!-- Готовая Material-тема от Radzen -->
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
+
+    <!-- Подключаем наш единственный и главный файл стилей -->
+    <link rel="stylesheet" href="@Assets["css/app.css"]" />
+
+    <!-- Inline-заглушка для иконки вкладки, чтобы браузер не искал файл и не выдавал 404 -->
+    <link rel="icon" href="data:;base64,=" />
+
+    <HeadOutlet @rendermode="InteractiveServer" />
+</head>
+<body>
+    <Routes @rendermode="InteractiveServer" />
+
+    <!-- Системные скрипты фреймворков -->
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+
+    <!-- Наш автономный скрипт: автопереход, печать и НАШЕ собственное конфетти -->
+    <script src="@Assets["js/math-trainer.js"]"></script>
+</body>
+</html>

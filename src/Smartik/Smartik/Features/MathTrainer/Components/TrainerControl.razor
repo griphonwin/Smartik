@@ -1,0 +1,130 @@
+﻿<RadzenCard Variant="Variant.Filled" Class="rz-mb-6 rz-p-4">
+    <RadzenRow RowGap="1rem" ColumnGap="1rem" AlignItems="AlignItems.End">
+
+        <!-- Верхний ряд: Пресеты сложности/возраста -->
+        @if (Presets != null && Presets.Count > 0)
+        {
+            <RadzenColumn Size="12">
+                <RadzenStack Gap="0.5rem">
+                    <label class="rz-label" style="font-size: 0.9rem; color: var(--rz-text-secondary-color); font-weight: 600;">👦 Режим тренировки:</label>
+                    <RadzenSelectBar TValue="string" @bind-Value="SelectedPreset" Change="@OnPresetChanged" Disabled="IsStarted" Size="ButtonSize.Medium">
+                        <Items>
+                            @foreach (var preset in Presets)
+                            {
+                                <RadzenSelectBarItem Text="@preset.Text" Value="@preset.Id" />
+                            }
+                        </Items>
+                    </RadzenSelectBar>
+                </RadzenStack>
+            </RadzenColumn>
+        }
+
+        <!-- Ручная настройка параметров -->
+        <RadzenColumn Size="12" SizeSm="6" SizeMd="3" SizeLg="2">
+            <label class="rz-label rz-mb-1" style="font-size: 0.85rem; color: var(--rz-text-secondary-color);">Количество заданий:</label>
+            <RadzenNumeric Min="1" Max="100" Value="Count" ValueChanged="@OnCountChanged" TValue="int" Class="w-100" Disabled="IsStarted" />
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeSm="6" SizeMd="3" SizeLg="2">
+            <label class="rz-label rz-mb-1" style="font-size: 0.85rem; color: var(--rz-text-secondary-color);">Макс. число (≤):</label>
+            <RadzenNumeric Min="0" Max="100" Value="MaxNumber" ValueChanged="@OnMaxNumberChanged" TValue="int" Class="w-100" Disabled="IsStarted" />
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeSm="6" SizeMd="3" SizeLg="2">
+            <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 48px;">
+                <RadzenBadge BadgeStyle="@(IsChecked ? BadgeStyle.Secondary : (!IsStarted ? BadgeStyle.Info : BadgeStyle.Warning))" Variant="Variant.Flat" Shade="Shade.Lighter" Style="font-size: 1.3rem; padding: 0.6rem 1rem; width: 100%; text-align: center; font-family: 'Consolas', monospace; font-weight: bold;">
+                    ⏱️ @TimerText
+                </RadzenBadge>
+            </RadzenStack>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeSm="12" SizeMd="9" SizeLg="6">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-w-100">
+                @if (!IsStarted)
+                {
+                    <RadzenButton Click="OnStartClick" Text="Начать тренировку" Icon="play_arrow" ButtonStyle="ButtonStyle.Success" Class="rz-w-100" />
+                }
+                else if (!IsChecked)
+                {
+                    <RadzenButton Click="OnCheckClick" Text="Проверить ответы" Icon="fact_check" ButtonStyle="ButtonStyle.Primary" Class="rz-w-100" />
+                    <RadzenButton Click="OnCancelClick" Text="Сбросить" Icon="cancel" ButtonStyle="ButtonStyle.Light" Style="min-width: 120px;" />
+                }
+                else
+                {
+                    <RadzenButton Click="OnResetClick" Text="Новая тренировка" Icon="refresh" ButtonStyle="ButtonStyle.Secondary" Class="rz-w-100" />
+                }
+                <RadzenButton Click="OnPrintClick" Text="Печать" Icon="print" ButtonStyle="ButtonStyle.Info" Style="min-width: 110px;" />
+            </RadzenStack>
+        </RadzenColumn>
+
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    [Parameter] public int Count { get; set; } = 12;
+    [Parameter] public EventCallback<int> CountChanged { get; set; }
+    [Parameter] public int MaxNumber { get; set; } = 10;
+    [Parameter] public EventCallback<int> MaxNumberChanged { get; set; }
+    [Parameter] public bool IsStarted { get; set; }
+    [Parameter] public bool IsChecked { get; set; }
+    [Parameter] public string TimerText { get; set; } = "00:00";
+    [Parameter] public IReadOnlyList<TrainerPreset> Presets { get; set; } = [];
+
+    [Parameter] public EventCallback OnStart { get; set; }
+    [Parameter] public EventCallback OnCheck { get; set; }
+    [Parameter] public EventCallback OnReset { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+
+    protected string? SelectedPreset { get; set; }
+
+    protected override void OnInitialized()
+    {
+        UpdatePresetSelection();
+    }
+
+    protected async Task OnPresetChanged(object objValue)
+    {
+        if (objValue is not string presetId || Presets == null) return;
+        SelectedPreset = presetId;
+
+        var target = Presets.FirstOrDefault(p => p.Id == presetId);
+        if (target != null)
+        {
+            Count = target.DefaultCount;
+            MaxNumber = target.DefaultMaxNumber;
+            await CountChanged.InvokeAsync(Count);
+            await MaxNumberChanged.InvokeAsync(MaxNumber);
+        }
+    }
+
+    private async Task OnCountChanged(int value)
+    {
+        Count = value;
+        UpdatePresetSelection();
+        await CountChanged.InvokeAsync(value);
+    }
+
+    private async Task OnMaxNumberChanged(int value)
+    {
+        MaxNumber = value;
+        UpdatePresetSelection();
+        await MaxNumberChanged.InvokeAsync(value);
+    }
+
+    private void UpdatePresetSelection()
+    {
+        if (Presets == null) return;
+        var match = Presets.FirstOrDefault(p => p.DefaultCount == Count && p.DefaultMaxNumber == MaxNumber);
+        SelectedPreset = match?.Id;
+    }
+
+    private async Task OnStartClick() => await OnStart.InvokeAsync();
+    private async Task OnCheckClick() => await OnCheck.InvokeAsync();
+    private async Task OnResetClick() { UpdatePresetSelection(); await OnReset.InvokeAsync(); }
+    private async Task OnCancelClick() { UpdatePresetSelection(); await OnCancel.InvokeAsync(); }
+    private async Task OnPrintClick() => await OnPrint.InvokeAsync();
+
+    // Вспомогательный DTO класс для пресетов
+    public record TrainerPreset(string Id, string Text, int DefaultCount, int DefaultMaxNumber);
+}

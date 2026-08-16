@@ -1,0 +1,21 @@
+﻿<RadzenPanelMenu Match="NavLinkMatch.All">
+
+    <!-- Ссылка на Главную страницу дашборда -->
+    <RadzenPanelMenuItem Text="🚀 Главная" Path="" Icon="home" />
+
+    <!-- Раздел для тренажеров (Вложенные пункты пишутся сразу внутри родительского тега) -->
+    <RadzenPanelMenuItem Text="school Занятия" Icon="school" Expanded="true">
+
+        <!-- Ссылка на Арифметику -->
+        <RadzenPanelMenuItem Text="🔢 Умный счет"
+                             Path="trainer/mixed"
+                             Icon="plus_one" />
+
+        <!-- Ссылка на Логику -->
+        <RadzenPanelMenuItem Text="🧠 Неравенства и логика"
+                             Path="trainer/logic"
+                             Icon="psychology" />
+
+    </RadzenPanelMenuItem>
+
+</RadzenPanelMenu>

@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+@using Smartik.Shared
+
+<!-- Глобальный контейнер Radzen Layout, который держит всю структуру сайта -->
+<RadzenLayout Style="grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body'; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; height: 100vh;">
+
+    <!-- 1. ВЕРХНЯЯ ШАПКА САЙТА (HEADER) -->
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Class="rz-px-4 rz-w-100">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
+                <!-- Кнопка сворачивания/разворачивания бокового меню -->
+                <RadzenSidebarToggle Click="@(() => _sidebarExpanded = !_sidebarExpanded)" />
+                <RadzenText TextStyle="TextStyle.H5" Style="color: white; font-weight: 800; margin: 0; letter-spacing: 1px;">
+                    🎓 SMARTIK АКАДЕМИЯ
+                </RadzenText>
+            </RadzenStack>
+            <RadzenBadge BadgeStyle="BadgeStyle.Success" Variant="Variant.Flat" Class="rz-p-2" Style="font-size: 0.9rem; font-weight: bold;">
+                🌟 Супер-Умник
+            </RadzenBadge>
+        </RadzenStack>
+    </RadzenHeader>
+
+    <!-- 2. ЛЕВАЯ ВЫДВИЖНАЯ ПАНЕЛЬ НАВИГАЦИИ (SIDEBAR) -->
+    <RadzenSidebar @bind-Expanded="@_sidebarExpanded" Style="z-index: 2;">
+        <RadzenStack Class="rz-p-4">
+
+            <!-- 🌟 ИСПОЛЬЗУЕМ НАШЕ ОБНОВЛЕННОЕ МЕНЮ ЗДЕСЬ! 🌟 -->
+            <NavMenu />
+
+        </RadzenStack>
+    </RadzenSidebar>
+
+    <!-- 3. ЦЕНТРАЛЬНАЯ РАБОЧАЯ ОБЛАСТЬ (BODY) -->
+    <RadzenBody>
+        <div class="rz-p-4 rz-p-md-6 rz-p-lg-8" style="max-width: 1200px; margin: 0 auto; width: 100%;">
+
+            @Body
+
+        </div>
+    </RadzenBody>
+
+</RadzenLayout>
+
+@code {
+    // Состояние развернутости меню (по умолчанию открыто на больших экранах)
+    private bool _sidebarExpanded = true;
+}
