@@ -3,57 +3,41 @@ using System.Security.Cryptography;
 
 namespace Smartik.Features.MathTrainer.Services;
 
-public sealed class LogicGeneratorService : ILogicGeneratorService
+public sealed class LogicGeneratorService : BaseGeneratorService<LogicExample, LogicGeneratorService.LogicCandidate, long>, ILogicGeneratorService
 {
+    public readonly record struct LogicCandidate(int Left, int Right, int Position);
+
     public IReadOnlyList<LogicExample> GenerateLogicExamples(int count, int maxNumber)
+        => GenerateExamples(count, maxNumber);
+
+    protected override void ResetSessionState() { } // Логике пока не нужны счетчики состояния
+
+    protected override LogicCandidate GenerateCandidate(int maxNumber)
     {
-        var examples = new List<LogicExample>(count);
-        // Хранилище уникальных ключей логических задач
-        var uniqueKeys = new HashSet<string>(count);
+        int left = RandomNumberGenerator.GetInt32(0, maxNumber + 1);
+        int right = RandomNumberGenerator.GetInt32(0, maxNumber + 1);
+        int position = RandomNumberGenerator.GetInt32(0, 3);
+        return new LogicCandidate(left, right, position);
+    }
 
-        for (int i = 0; i < count; i++)
-        {
-            LogicExample? generatedExample = null;
-            int attempts = 0;
-            const int maxAttempts = 10;
+    protected override bool IsValidCandidate(in LogicCandidate candidate, HashSet<long> uniqueKeys, out long key)
+    {
+        key = ((long)candidate.Left << 35) | ((long)candidate.Right << 3) | (long)candidate.Position;
+        return !uniqueKeys.Contains(key);
+    }
 
-            while (attempts < maxAttempts)
-            {
-                int left = RandomNumberGenerator.GetInt32(0, maxNumber + 1);
-                int right = RandomNumberGenerator.GetInt32(0, maxNumber + 1);
-                string correctSign = left < right ? "<" : (left > right ? ">" : "=");
-                int position = RandomNumberGenerator.GetInt32(0, 3);
+    protected override void OnExampleAdded(in LogicCandidate candidate) { }
 
-                if (position == 0)
-                {
-                    generatedExample = new LogicExample("_", right.ToString(), correctSign, left, 0);
-                }
-                else if (position == 2)
-                {
-                    generatedExample = new LogicExample(left.ToString(), "_", correctSign, right, 2);
-                }
-                else
-                {
-                    generatedExample = new LogicExample(left.ToString(), right.ToString(), correctSign, null, 1);
-                }
+    protected override LogicExample CreateFinalExample(in LogicCandidate candidate)
+    {
+        string correctSign = candidate.Left < candidate.Right ? "<" : (candidate.Left > candidate.Right ? ">" : "=");
 
-                // Уникальный ключ логики учитывает операнды, знак и позицию скрытой клетки, например: "5<10_pos1"
-                string key = $"{left}{correctSign}{right}_pos{position}";
+        if (candidate.Position == 0)
+            return new LogicExample("_", candidate.Right.ToString(), correctSign, candidate.Left, 0);
 
-                if (uniqueKeys.Add(key))
-                {
-                    break;
-                }
+        if (candidate.Position == 2)
+            return new LogicExample(candidate.Left.ToString(), "_", correctSign, candidate.Right, 2);
 
-                attempts++;
-            }
-
-            if (generatedExample != null)
-            {
-                examples.Add(generatedExample);
-            }
-        }
-
-        return [.. examples];
+        return new LogicExample(candidate.Left.ToString(), candidate.Right.ToString(), correctSign, null, 1);
     }
 }
