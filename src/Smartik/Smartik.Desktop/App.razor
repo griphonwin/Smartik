@@ -1,0 +1,12 @@
+<Router AppAssembly="@typeof(Smartik.Shared.App).Assembly">
+    <Found Context="routeData">
+        <!-- Указываем ваш стандартный Layout из веб-версии -->
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Smartik.Shared.Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(Smartik.Shared.Layout.MainLayout)">
+            <p role="alert">Страница не найдена внутри десктопной сборки.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

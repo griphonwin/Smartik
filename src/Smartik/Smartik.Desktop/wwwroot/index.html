@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smartik Math Trainer</title>
+    <base href="/" />
+
+    <!-- Подключаем стили Radzen и вашего веб-проекта Smartik -->
+    <!-- .NET 10 автоматически экспортирует их из связанного проекта по имени сборки -->
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
+    <link rel="stylesheet" href="_content/Smartik/css/app.css" />
+</head>
+<body>
+
+    <!-- Родная точка монтирования Blazor Hybrid -->
+    <div id="app">Загрузка тренажера...</div>
+
+    <!-- Системные скрипты инициализации локального WebView2 -->
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_framework/blazor.webview.js"></script>
+    <script src="_content/Smartik/js/math-trainer.js"></script>
+
+</body>
+</html>

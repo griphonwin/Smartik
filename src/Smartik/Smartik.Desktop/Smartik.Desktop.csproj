@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- Базовый путь для локальных статических ресурсов -->
+		<StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Возвращаем правильный пакет для интеграции Blazor и родного окна -->
+		<PackageReference Include="Photino.Blazor" Version="4.0.13" />
+		<PackageReference Include="Radzen.Blazor" Version="11.2.6" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Прямая ссылка на ваш проект Smartik для получения всех готовых компонентов -->
+		<ProjectReference Include="..\Smartik\Smartik.csproj" />
+	</ItemGroup>
+
+</Project>
