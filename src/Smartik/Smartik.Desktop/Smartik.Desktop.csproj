@@ -9,6 +9,7 @@
 		<StaticWebAssetBasePath>/</StaticWebAssetBasePath>
 		<DefineConstants>DESKTOP</DefineConstants>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<IncludeToSingleFile>false</IncludeToSingleFile>
 	</PropertyGroup>
 
 	<ItemGroup>

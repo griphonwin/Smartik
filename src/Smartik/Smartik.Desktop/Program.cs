@@ -11,8 +11,11 @@ class Program
     static void Main(string[] args)
     {
         // 1. Фикс папки
-        string binWwwroot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wwwroot");
-        if (!Directory.Exists(binWwwroot)) Directory.CreateDirectory(binWwwroot);
+        string baseDir = AppContext.BaseDirectory;
+        // Указываем Photino, что wwwroot нужно искать там, куда распаковался .exe
+        Directory.SetCurrentDirectory(baseDir); 
+        string binWwwroot = Path.Combine(baseDir, "wwwroot");
+        if (!Directory.Exists(binWwwroot)) Directory.CreateDirectory(binWwwroot);        
 
         // 2. Отключаем InteractiveServer в веб-версии
         Smartik.Shared.App.IsDesktopMode = true;
@@ -34,10 +37,13 @@ class Program
         app.MainWindow
             .SetTitle("Smartik Math Trainer")
             .SetSize(1200, 800)
-            .SetUseOsDefaultSize(false)
-            .SetIconFile("wwwroot/icon.png");
+            .SetUseOsDefaultSize(false);
 
-        // ЖЕЛЕЗОБЕТОННЫЙ ФИКС ЛОГОВ: Отключаем вывод отладочных сообщений Photino в ноль
+        string iconPath = Path.Combine(baseDir, "wwwroot", "icon.png");
+        if (File.Exists(iconPath))
+        {
+            app.MainWindow.SetIconFile(iconPath);
+        }
         app.MainWindow.LogVerbosity = 0;
 
         app.Run();
