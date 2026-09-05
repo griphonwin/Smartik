@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build-windows:
-    name: Build Windows Single EXE
+    name: Build Windows App
     runs-on: windows-latest
 
     steps:
@@ -22,16 +22,12 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Publish Windows App (Auto-Search Project)
+      - name: Publish Windows App
         shell: pwsh
         run: |
-          # Автоматически находим правильный путь к файлу проекта, где бы он ни лежал
           $csproj = Get-ChildItem -Recurse -Filter "Smartik.Desktop.csproj" | Select-Object -First 1
-          if (-not $csproj) { throw "Файл Smartik.Desktop.csproj не найден в репозитории!" }
           
-          Write-Host "Найден проект: $($csproj.FullName)" -ForegroundColor Green
-          
-          # Запускаем сборку с вашими флагами
+          # Публикуем приложение в папку ./publish-win со всеми ассетами
           dotnet publish $($csproj.FullName) `
             -c Release `
             -r win-x64 `
@@ -42,10 +38,16 @@ jobs:
             /p:IncludeNativeLibrariesForSelfExtract=true `
             /p:EnableCompressionInSingleFile=true
 
-      - name: Create GitHub Release and Upload EXE
+      - name: Zip Output Folder
+        shell: pwsh
+        run: |
+          # Архивируем .exe вместе со сгенерированной папкой wwwroot
+          Compress-Archive -Path ./publish-win/* -DestinationPath ./Smartik-Windows.zip
+
+      - name: Create GitHub Release and Upload ZIP
         uses: softprops/action-gh-release@v2
         with:
-          files: ./publish-win/Smartik.Desktop.exe
+          files: ./Smartik-Windows.zip
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
           draft: false

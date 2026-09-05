@@ -1,4 +1,8 @@
 <Solution>
+  <Folder Name="/Shared/">
+    <File Path="../../.github/workflows/build-photino.yml" />
+    <File Path="../../README.md" />
+  </Folder>
   <Project Path="Smartik.Desktop/Smartik.Desktop.csproj" Id="02ccecde-8e2e-498b-9e6b-89319eb41e3a" />
   <Project Path="Smartik/Smartik.csproj" />
 </Solution>

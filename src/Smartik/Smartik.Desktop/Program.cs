@@ -13,7 +13,14 @@ class Program
     {
         // 1. Фикс рабочей директории
         string baseDir = AppContext.BaseDirectory;
-        Directory.SetCurrentDirectory(baseDir); 
+        Directory.SetCurrentDirectory(baseDir);
+
+        // Инициализируем локальную папку wwwroot для работы Photino, если её нет на диске
+        string binWwwroot = Path.Combine(baseDir, "wwwroot");
+        if (!Directory.Exists(binWwwroot))
+        {
+            Directory.CreateDirectory(binWwwroot);
+        }
 
         // 2. Отключаем InteractiveServer в веб-версии
         Smartik.Shared.App.IsDesktopMode = true;
@@ -27,16 +34,10 @@ class Program
         appBuilder.Services.AddScoped<IPrintService, PrintService>();
         appBuilder.Services.AddLogging();
 
+        // Регистрируем корневой компонент Blazor
         appBuilder.RootComponents.Add<App>("#app");
 
         var app = appBuilder.Build();
-
-        // [КРИТИЧЕСКИЙ ФИКС ДЛЯ SINGLE FILE] 
-        // Если движок не находит физический файл, мы говорим ему брать его из ресурсов сборки
-        app.MainWindow.PathToFileReadyToRunDelegate = (string path) =>
-        {
-            return Path.Combine(baseDir, path);
-        };
 
         // 4. НАСТРОЙКА ОКНА
         app.MainWindow
@@ -44,13 +45,13 @@ class Program
             .SetSize(1200, 800)
             .SetUseOsDefaultSize(false);
 
-        // Иконку ставим безопасно
-        string iconPath = Path.Combine(baseDir, "wwwroot", "icon.png");
+        // Иконку ставим только при фактическом наличии файла
+        string iconPath = Path.Combine(binWwwroot, "icon.png");
         if (File.Exists(iconPath))
         {
             app.MainWindow.SetIconFile(iconPath);
         }
-        
+
         app.MainWindow.LogVerbosity = 0;
 
         app.Run();
