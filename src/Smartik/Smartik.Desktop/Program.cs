@@ -3,6 +3,7 @@ using Photino.Blazor;
 using Radzen;
 using Smartik.Features.MathTrainer.Services;
 using Smartik.Shared;
+using System;
 using System.IO;
 
 class Program
@@ -10,12 +11,9 @@ class Program
     [STAThread]
     static void Main(string[] args)
     {
-        // 1. Фикс папки
+        // 1. Фикс рабочей директории
         string baseDir = AppContext.BaseDirectory;
-        // Указываем Photino, что wwwroot нужно искать там, куда распаковался .exe
         Directory.SetCurrentDirectory(baseDir); 
-        string binWwwroot = Path.Combine(baseDir, "wwwroot");
-        if (!Directory.Exists(binWwwroot)) Directory.CreateDirectory(binWwwroot);        
 
         // 2. Отключаем InteractiveServer в веб-версии
         Smartik.Shared.App.IsDesktopMode = true;
@@ -33,17 +31,26 @@ class Program
 
         var app = appBuilder.Build();
 
+        // [КРИТИЧЕСКИЙ ФИКС ДЛЯ SINGLE FILE] 
+        // Если движок не находит физический файл, мы говорим ему брать его из ресурсов сборки
+        app.MainWindow.PathToFileReadyToRunDelegate = (string path) =>
+        {
+            return Path.Combine(baseDir, path);
+        };
+
         // 4. НАСТРОЙКА ОКНА
         app.MainWindow
             .SetTitle("Smartik Math Trainer")
             .SetSize(1200, 800)
             .SetUseOsDefaultSize(false);
 
+        // Иконку ставим безопасно
         string iconPath = Path.Combine(baseDir, "wwwroot", "icon.png");
         if (File.Exists(iconPath))
         {
             app.MainWindow.SetIconFile(iconPath);
         }
+        
         app.MainWindow.LogVerbosity = 0;
 
         app.Run();

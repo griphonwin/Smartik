@@ -2,15 +2,14 @@
 
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<StaticWebAssetBasePath>/</StaticWebAssetBasePath>
 		<DefineConstants>DESKTOP</DefineConstants>
 		<ApplicationIcon>icon.ico</ApplicationIcon>
-		<IncludePatternsToSingleFile>wwwroot\**</IncludePatternsToSingleFile>
 	</PropertyGroup>
+
 
 	<ItemGroup>
 		<PackageReference Include="Photino.Blazor" Version="4.0.13" />
