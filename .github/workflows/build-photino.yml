@@ -1,0 +1,51 @@
+name: Build Photino Desktop (.NET 10)
+
+on:
+  push:
+    tags:
+      - 'v*' # Автоматический запуск при создании тегов вида v1.0.0
+
+permissions:
+  contents: write # Дает право GitHub Actions создавать релизы
+
+jobs:
+  build-windows:
+    name: Build Windows Single EXE
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore Dependencies
+        run: dotnet restore src/Smartik.Desktop/Smartik.Desktop.csproj
+
+      - name: Publish Windows App (Single File)
+        # Точно такие же флаги, как в вашем PowerShell скрипте
+        run: |
+          dotnet publish src/Smartik.Desktop/Smartik.Desktop.csproj `
+            -c Release `
+            -r win-x64 `
+            -o ./publish-win `
+            --self-contained true `
+            /p:PublishSingleFile=true `
+            /p:PublishReadyToRun=true `
+            /p:IncludeNativeLibrariesForSelfExtract=true `
+            /p:EnableCompressionInSingleFile=true
+
+      - name: Create GitHub Release and Upload EXE
+        uses: softprops/action-gh-release@v2
+        with:
+          # Загружаем напрямую чистый .exe файл вместо zip-архива
+          files: ./publish-win/Smartik.Desktop.exe
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

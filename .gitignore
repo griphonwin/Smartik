@@ -480,3 +480,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Исключаем папку локальной сборки десктопного приложения
+**/build/
